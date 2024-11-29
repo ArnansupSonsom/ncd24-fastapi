@@ -71,7 +71,8 @@ jobs:
       - name: fix lower case to
         shell: bash
         run: |
-           echo "IMAGE_REPO_DOCKER_PUSH=${{ env.IMAGE_REPO }} | tr '[A-Z]' '[a-z]'" >> $GITHUB_ENV
+          image_docker_lower=$(echo "$IMAGE_DOCKER" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_REPO_DOCKER_PUSH=$image_docker_lower" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v4
