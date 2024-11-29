@@ -108,7 +108,7 @@ jobs:
         id: check-tag
         with:
           registry: ${{ env.IMAGE_REGISTRY }}
-          repository: ${{ env.IMAGE_REPO }}
+          repository: ${{ env.IMAGE_REPO_DOCKER_PUSH }}
           tag: ${{ needs.setup.outputs.image_tag }}
       - name: Fail if container image tag not exists
         if: steps.check-tag.outputs.tag == 'not found'
