@@ -9,6 +9,7 @@ env:
   GITOPS_REPO: ${{ github.actor }}/ncd24-gitops
   HELM_VALUES_FOLDER: helm-values
   HELM_VALUES_FILE_PREFIX: ncd24-fastapi
+  IMAGE_REPO_DOCKER_PUSH: ""
 
 on:
   push:
@@ -67,6 +68,11 @@ jobs:
     permissions:
       packages: write
     steps:
+      - name: fix lower case to
+        shell: bash
+        run: |
+           echo "IMAGE_REPO_DOCKER_PUSH=${{ env.IMAGE_REPO }} | tr '[A-Z]' '[a-z]'" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v4
       - name: Login to Container Registry
@@ -84,8 +90,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ needs.setup.outputs.tags }}
           labels: ${{ needs.setup.outputs.labels }}
-          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
-          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPO_DOCKER_PUSH }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.IMAGE_REPO_DOCKER_PUSH }}:buildcache
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
 
@@ -95,7 +101,7 @@ jobs:
     needs:
       - setup
       - build-push
-    steps:
+    steps:           
       - name: Check if container image tag exists
         uses: tyriis/docker-image-tag-exists@v2.1.0
         id: check-tag
