@@ -10,6 +10,7 @@ env:
   HELM_VALUES_FOLDER: helm-values
   HELM_VALUES_FILE_PREFIX: ncd24-fastapi
   IMAGE_REPO_DOCKER_PUSH: ""
+  IMAGE_REPO_LOWERCASE: ""
 
 on:
   push:
@@ -103,12 +104,18 @@ jobs:
       - setup
       - build-push
     steps:           
+      - name: fix lower case to
+        shell: bash
+        run: |
+          image_docker_lower=$(echo "$IMAGE_REPO" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_REPO_LOWERCASE=$image_docker_lower" >> $GITHUB_ENV
+
       - name: Check if container image tag exists
         uses: tyriis/docker-image-tag-exists@v2.1.0
         id: check-tag
         with:
           registry: ${{ env.IMAGE_REGISTRY }}
-          repository: ${{ env.IMAGE_REPO_DOCKER_PUSH }}
+          repository: ${{ env.IMAGE_REPO_LOWERCASE }}
           tag: ${{ needs.setup.outputs.image_tag }}
       - name: Fail if container image tag not exists
         if: steps.check-tag.outputs.tag == 'not found'
